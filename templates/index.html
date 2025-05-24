@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Pacientes</title>
+</head>
+
+<body>
+    <h1>Listado de Pacientes</h1>
+    <form action="/add" method="POST">
+        <label for="nombre_paciente">Nombre del paciente:</label>
+        <input type="text" name="nombre_paciente" required>
+        <label for="fecha_turno">Fecha del turno:</label>
+        <input type="text" name="fecha_turno" required>
+        <label for="nombre_medico">Nombre del Medico:</label>
+        <input type="text" name="nombre_medico" required>
+        <button type="submit">Agregar Turno</button>
+    </form>
+    <h2>Pacientes Registrados:</h2>
+    <ul>
+        {% for paciente in pacientes %}
+            <li>{{ paciente.nombre }} 
+                <a href="/vistap">Lista de pacientes</a>
+            </li>
+        {% endfor %}
+    </ul>
+    
+</body>
+
+</html>

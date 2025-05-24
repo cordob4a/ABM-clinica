@@ -1,0 +1,12 @@
+<h2>Pacientes Registrados:</h2>
+    <ul>
+        {% for paciente in paciente %}
+        <li>
+            Médico: {{ paciente.nombre_medico }} -
+            Paciente: {{ paciente.nombre_paciente }} -  
+            Turno: {{ paciente.fecha_turno }}
+            <a href="/edit/medico.id">Editar</a>
+            <a href="/delete/{{ medico.id }}">Eliminar</a>
+        </li>
+        {% endfor %}
+    </ul>
