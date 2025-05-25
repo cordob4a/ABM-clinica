@@ -2,10 +2,10 @@
     <ul>
         {% for paciente in pacientes %}
         <li>
-            Paciente: {{ paciente.nombre_paciente }} - 
-            Médico: {{ paciente.nombre_medico }} - 
-            Turno: {{ paciente.fecha_turno }}
-            <a href="{{ url_for('edit', id=paciente.id) }}">Editar Turno</a>
+            DNI: {{ paciente.dni }} - 
+            Nombre: {{ paciente.nombre}} - 
+            Telefono: {{ paciente.tel }}
+            <a href="{{ url_for('edit', dni=paciente.dni) }}">Editar Turno</a>
             
         </li>
         {% endfor %}

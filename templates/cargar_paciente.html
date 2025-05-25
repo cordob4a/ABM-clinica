@@ -4,22 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Paciente</title>
+    <title>CRUD Pacientes</title>
 </head>
 
 <body>
-    <h1>Editar Paciente</h1>
-    <form
-        action="/edit/{{ paciente.dni }}"
-        method="POST">
+    <h1>Listado de Pacientes</h1>
+    <form action="/add" method="POST">
         <label for="DNI">DNI del paciente:</label>
         <input type="number" name="dni" required>
         <label for="nombre">nombre del paciente:</label>
         <input type="text" name="nombre" required>
         <label for="tel">Telefono del paciente:</label>
         <input type="number" name="tel" required>
-        <button type="submit">Actualizar</button>
-    </form>
-</body>
 
+        <button type="submit">Agregar Turno</button>
+    </form>
+    <h2>Pacientes Registrados:</h2>
+        
+
+    <ul>
+        {% for paciente in pacientes %}
+            <li>{{ paciente.nombre }} 
+                <a href="/vistap">Lista de pacientes</a>
+            </li>
+        {% endfor %}
+    </ul>
+    
+</body>
 </html>
