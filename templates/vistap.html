@@ -5,8 +5,10 @@
             DNI: {{ paciente.dni }} - 
             Nombre: {{ paciente.nombre}} - 
             Telefono: {{ paciente.tel }}
-            <a href="{{ url_for('edit', dni=paciente.dni) }}">Editar Turno</a>
-            
+            <a href="{{ url_for('edit', dni=paciente.dni) }}">Editar</a>
+            <form action="{{ url_for('delete', dni=paciente.dni) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este paciente?')">
+                <button type="submit">🗑️ Eliminar</button>
+            </form>
         </li>
         {% endfor %}
     </ul>

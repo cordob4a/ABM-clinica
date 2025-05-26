@@ -8,8 +8,13 @@
 </head>
 
 <body>
-    <h1>Listado de Pacientes</h1>
-    <form action="/add" method="POST">
+    <h1>Cargar datos de Pacientes</h1>
+    {% if error %}
+<script>
+    alert("{{ error }}");
+</script>
+{% endif %}
+    <form action="/cargar_paciente" method="POST">
         <label for="DNI">DNI del paciente:</label>
         <input type="number" name="dni" required>
         <label for="nombre">nombre del paciente:</label>
@@ -19,7 +24,7 @@
 
         <button type="submit">Agregar Turno</button>
     </form>
-    <h2>Pacientes Registrados:</h2>
+    
         
 
     <ul>

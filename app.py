@@ -34,13 +34,19 @@ def home():
 @app.route('/cargar_paciente', methods=['GET', 'POST'])
 def cargar_paciente():
     if request.method == 'POST':
-        dni = int(request.form['dni'])
+        dni = int(re.sub(r"\D", "", request.form['dni']))
         nombre = request.form['nombre']
         tel = request.form['tel']
+
+        # Verificamos si ya existe ese DNI
+        if Paciente.query.get(dni):
+            return render_template('cargar_paciente.html', error="El paciente ya existe.")
+
         paciente = Paciente(dni=dni, nombre=nombre, tel=tel)
         db.session.add(paciente)
         db.session.commit()
         return redirect(url_for('home'))
+
     return render_template('cargar_paciente.html')
 
 
@@ -75,7 +81,7 @@ def edit(dni):
         return redirect(url_for('ver_pacientes'))
     return render_template('edit.html', paciente=paciente)
 
-@app.route('/delete/<int:dni>')
+@app.route('/delete/<int:dni>', methods=['POST'])
 def delete(dni):
     paciente = Paciente.query.get_or_404(dni)
     db.session.delete(paciente)
