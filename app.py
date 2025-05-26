@@ -5,14 +5,13 @@ import re
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinica.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy(app)    
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
     dni = db.Column(db.BigInteger, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
-    tel = db.Column(db.String(100), nullable=False)
-
+    tel = db.Column(db.String(10))
     def __repr__(self):
         return f"<Paciente: {self.nombre} - DNI: {self.dni}>"
 
@@ -25,6 +24,12 @@ class Turno(db.Model):
     hora = db.Column(db.String(10), nullable=False)
     estado = db.Column(db.String(20), nullable=False)
 
+    class Medico(db.Model):
+        __table__ = 'medico'
+        matricula = db.column(db.integer, primary_key=True, nullable=False) 
+        nombre = db.column(db.String(100), nullable=False)
+        especialidad = db.column(db.String(100), nullable=False)
+        tel = db.column(db.String(10), nullable=False)
 
 @app.route('/')
 def home():
