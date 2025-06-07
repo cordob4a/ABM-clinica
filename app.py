@@ -19,7 +19,6 @@ class Turno(db.Model):
     __tablename__ = 'turno'
     id = db.Column(db.Integer, primary_key=True)
     dni = db.Column(db.Integer, db.ForeignKey('paciente.dni'), nullable=False)
-    matricula = db.Column(db.BigInteger, nullable=False)
     fecha = db.Column(db.String(20), nullable=False)
     estado = db.Column(db.String(20), nullable=False)
     matricula = db.Column(db.Integer, db.ForeignKey('medico.matricula'), nullable=False)
@@ -30,6 +29,7 @@ class Medico(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     especialidad = db.Column(db.String(100), nullable=False)
     tel = db.Column(db.String(20), nullable=False)
+    estado = db.Column(db.String(20), default='activo')
     def __repr__(self):
         return f"<Medico: {self.nombre} - Matricula: {self.matricula}>"
 
@@ -66,7 +66,7 @@ def cargar_paciente():
     return render_template('cargar_paciente.html')
 
 
-@app.route('/cargar_turno', methods=['GET', 'POST'])
+@app.route('/cargar_turno', methods=['GET', 'POST']) 
 def cargar_turno():
     especialidades = db.session.query(Medico.especialidad).distinct().all()
     especialidades = [e[0] for e in especialidades]
@@ -81,17 +81,34 @@ def cargar_turno():
         if not paciente:
             return render_template('cargar_turno.html', especialidades=especialidades, error="Paciente no registrado.")
 
-        medico = Medico.query.filter_by(especialidad=especialidad).first()
-        if not medico:
-            return render_template('cargar_turno.html', especialidades=especialidades, error="No hay médico con esa especialidad.")
+        # 🔧 Buscar médicos activos con esa especialidad
+        medicos = Medico.query.filter_by(especialidad=especialidad, estado='activo').all()
 
-        turno = Turno(fecha=fecha, dni=dni, matricula=medico.matricula, estado=estado)
+        medico_disponible = None
+        for m in medicos:
+            cantidad_turnos = Turno.query.filter_by(matricula=m.matricula, fecha=fecha).count()
+            if cantidad_turnos < 10:
+                medico_disponible = m
+                break  # ✅ salir cuando se encuentra uno válido
+
+        if not medico_disponible:
+            return render_template('cargar_turno.html', especialidades=especialidades,
+                                   error="No hay médico disponible para esa especialidad en esa fecha.")
+
+        # Validar que el paciente no tenga un turno en esa fecha
+        turno_existente = Turno.query.filter_by(dni=dni, fecha=fecha).first()
+        if turno_existente:
+            return render_template('cargar_turno.html', especialidades=especialidades,
+                                   error="El paciente ya tiene un turno para esa fecha.")
+
+        # ✅ Crear turno
+        turno = Turno(fecha=fecha, dni=dni, matricula=medico_disponible.matricula, estado=estado)
         db.session.add(turno)
 
-        # ✅ Crear historia clínica antes del commit
+        # ✅ Crear historia clínica
         nueva_historia = HistoriaClinica(
             dni_paciente=dni,
-            matricula_medico=medico.matricula,
+            matricula_medico=medico_disponible.matricula,
             fecha=fecha,
             descripcion="Pendiente de completar"
         )
@@ -101,6 +118,8 @@ def cargar_turno():
         return redirect(url_for('home'))
 
     return render_template('cargar_turno.html', especialidades=especialidades)
+
+
 
 
 def get_especialidades():
@@ -131,9 +150,23 @@ def delete(dni):
     db.session.commit()
     return redirect(url_for('ver_pacientes'))
 
-@app.route('/ver_turnos')
+@app.route('/ver_turnos', methods=['GET', 'POST'])
 def ver_turnos():
-    turnos = Turno.query.all()
+    turnos_query = Turno.query  # 👈 armamos la consulta (aún no ejecutada)
+
+    if request.method == 'POST':
+        dni = request.form.get('dni')
+        fecha = request.form.get('fecha')
+        estado = request.form.get('estado')
+
+        if dni:
+            turnos_query = turnos_query.filter_by(dni=dni)
+        if fecha:
+            turnos_query = turnos_query.filter_by(fecha=fecha)
+        if estado:
+            turnos_query = turnos_query.filter_by(estado=estado)    
+
+    turnos = turnos_query.all()  # 👈 ejecutamos la consulta final
     datos = []
     for turno in turnos:
         medico = Medico.query.get(turno.matricula)
@@ -141,7 +174,9 @@ def ver_turnos():
             'turno': turno,
             'especialidad': medico.especialidad if medico else 'No asignada'
         })
+
     return render_template('vistat.html', datos=datos)
+
 
 
 @app.route('/editar_turno/<int:id>', methods=['GET', 'POST'])
