@@ -9,11 +9,8 @@ db = SQLAlchemy(app)
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
-<<<<<<< HEAD
     dni = db.Column(db.BigInteger, primary_key=True)
-=======
     dni = db.Column(db.Integer, primary_key=True)
->>>>>>> main
     nombre = db.Column(db.String(100), nullable=False)
     tel = db.Column(db.String(10))
     def __repr__(self):
@@ -22,7 +19,7 @@ class Paciente(db.Model):
 class Turno(db.Model):
     __tablename__ = 'turno'
     id = db.Column(db.Integer, primary_key=True)
-<<<<<<< HEAD
+
     dni_paciente = db.Column(db.BigInteger, db.ForeignKey('paciente.dni'), nullable=False)
     matricula = db.Column(db.BigInteger, nullable=False)
     fecha = db.Column(db.String(20), nullable=False)
@@ -35,7 +32,7 @@ class Turno(db.Model):
         nombre = db.column(db.String(100), nullable=False)
         especialidad = db.column(db.String(100), nullable=False)
         tel = db.column(db.String(10), nullable=False)
-=======
+
     dni = db.Column(db.Integer, db.ForeignKey('paciente.dni'), nullable=False)
     fecha = db.Column(db.String(20), nullable=False)
     estado = db.Column(db.String(20), nullable=False)
@@ -59,7 +56,7 @@ class HistoriaClinica(db.Model):
     fecha = db.Column(db.String(20), nullable=False)
     descripcion = db.Column(db.Text, nullable=False)
 
->>>>>>> main
+
 
 @app.route('/')
 def home():
@@ -84,8 +81,6 @@ def cargar_paciente():
 
     return render_template('cargar_paciente.html')
 
-
-<<<<<<< HEAD
 @app.route('/cargar_turno', methods=['GET', 'POST'])
 def cargar_turno():
     if request.method == 'POST':
@@ -99,7 +94,7 @@ def cargar_turno():
         db.session.commit()
         return redirect(url_for('home'))
     return render_template('/ cargar_turno.html')
-=======
+
 @app.route('/cargar_turno', methods=['GET', 'POST']) 
 def cargar_turno():
     especialidades = db.session.query(Medico.especialidad).distinct().all()
@@ -159,8 +154,6 @@ def cargar_turno():
 def get_especialidades():
     especialidades = db.session.query(Medico.especialidad).distinct().all()
     return [e[0] for e in especialidades]
->>>>>>> main
-
 
 @app.route('/vistap')
 def ver_pacientes():
@@ -184,8 +177,6 @@ def delete(dni):
     db.session.delete(paciente)
     db.session.commit()
     return redirect(url_for('ver_pacientes'))
-<<<<<<< HEAD
-=======
 
 @app.route('/ver_turnos', methods=['GET', 'POST'])
 def ver_turnos():
@@ -253,7 +244,6 @@ def editar_turno(id):
         return redirect(url_for('home'))
 
     return render_template('editar_turno.html', turno=turno, especialidades=especialidades, historia=historia)
->>>>>>> main
 
 if __name__ == '__main__':
     app.run(debug=True)
