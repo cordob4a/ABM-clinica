@@ -1,0 +1,25 @@
+<h1>Lista de Turnos</h1>
+<form method="POST">
+    <input type="number" name="dni" placeholder="DNI del paciente">
+    <input type="date" name="fecha">
+    <label for="estado">Estado:</label>
+    <select name="estado" required>
+    <option value="abierto">Abierto</option>
+    <option value="cerrado">Cerrado</option>
+    </select>   
+    <button type="submit">Filtrar</button>
+    <a href="{{ url_for('ver_turnos') }}">
+    <button type="button">Restablecer</button>
+</a>
+</form>
+<ul>
+    {% for item in datos %}
+    <li>
+        Turno ID: {{ item.turno.id }} - Fecha: {{ item.turno.fecha }} - Estado: {{ item.turno.estado }} -
+        Especialidad: {{ item.especialidad }}
+        <a href="{{ url_for('editar_turno', id=item.turno.id) }}">📝 Editar</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('home') }}">🏠 Volver al inicio</a>
+
