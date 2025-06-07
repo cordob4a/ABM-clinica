@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cargar Turno</title>
+</head>
+<body>
+    <h1>Registrar Turno</h1>
+
+    {% if error %}
+        <p style="color:red">{{ error }}</p>
+    {% endif %}
+
+    <form action="/cargar_turno" method="POST">
+        <label for="dni">DNI del Paciente:</label>
+        <input type="number" name="dni" required><br><br>
+
+        <label for="especialidad">Especialidad del Médico:</label>
+        <select name="especialidad" required>
+            {% for esp in especialidades %}
+            <option value="{{ esp }}">{{ esp }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="fecha">Fecha:</label>
+        <input type="date" name="fecha" required><br><br>
+
+        <label for="estado">Estado:</label>
+        <select name="estado" required>
+            <option value="abierto">Abierto</option>
+            <option value="cerrado">Cerrado</option>
+        </select><br><br>
+
+        <button type="submit">Guardar Turno</button>
+    </form>
+</body>
+</html>

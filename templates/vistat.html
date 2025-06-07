@@ -1,0 +1,12 @@
+<h1>Lista de Turnos</h1>
+<ul>
+    {% for item in datos %}
+    <li>
+        Turno ID: {{ item.turno.id }} - Fecha: {{ item.turno.fecha }} - Estado: {{ item.turno.estado }} -
+        Especialidad: {{ item.especialidad }}
+        <a href="{{ url_for('editar_turno', id=item.turno.id) }}">📝 Editar</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('home') }}">🏠 Volver al inicio</a>
+

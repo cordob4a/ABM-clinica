@@ -1,0 +1,20 @@
+<h1>Editar Turno</h1>
+
+<form method="POST">
+    <label for="fecha">Fecha:</label>
+    <input type="date" name="fecha" value="{{ turno.fecha }}" required><br><br>
+
+    <label for="estado">Estado:</label>
+    <label for="descripcion">Historia Clínica:</label>
+    <textarea name="descripcion" rows="4">{{ historia.descripcion }}</textarea>
+    <select name="estado" required>
+        <option value="abierto" {% if turno.estado == 'abierto' %}selected{% endif %}>Abierto</option>
+        <option value="cerrado" {% if turno.estado == 'cerrado' %}selected{% endif %}>Cerrado</option>
+    </select><br><br>
+
+    <button type="submit">Actualizar Turno</button>
+</form>
+
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %}

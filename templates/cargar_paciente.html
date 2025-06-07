@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Pacientes</title>
+</head>
+
+<body>
+    <h1>Cargar datos de Pacientes</h1>
+    {% if error %}
+<script>
+    alert("{{ error }}");
+</script>
+{% endif %}
+    <form action="/cargar_paciente" method="POST">
+        <label for="DNI">DNI del paciente:</label>
+        <input type="number" name="dni" required>
+        <label for="nombre">nombre del paciente:</label>
+        <input type="text" name="nombre" required>
+        <label for="tel">Telefono del paciente:</label>
+        <input type="number" name="tel" required>
+
+        <button type="submit">Agregar paciente</button>
+    </form>
+    
+        
+
+    <ul>
+        {% for paciente in pacientes %}
+            <li>{{ paciente.nombre }} 
+                <a href="/vistap">Lista de pacientes</a>
+            </li>
+        {% endfor %}
+    </ul>
+    
+</body>
+</html>
