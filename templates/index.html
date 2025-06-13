@@ -1,25 +1,30 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Inicio</title>
+    <title>Agenda de Turnos</title>
 </head>
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
 <body>
-    <h1>Sistema de Gestión Clínica</h1>
-    <ul>
-
-        <li><a href="{{ url_for('cargar_paciente') }}">➕ Cargar nuevo paciente</a></li>
-        <li><a href="{{ url_for('cargar_turno') }}">🗓️ Cargar nuevo turno</a></li>
-        <a href="{{ url_for('ver_pacientes') }}">👥 Ver lista de pacientes</a>
-
-
-        <li><a href="{{ url_for('ver_pacientes') }}">👥 Ver lista de pacientes</a></li>
-        <li><a href="{{ url_for('ver_turnos') }}">📋 Ver lista de turnos</a></li>
-        <li><a href="{{ url_for('cargar_paciente') }}">➕ Cargar nuevo paciente</a></li>
-        <li><a href="{{ url_for('cargar_turno') }}">🗓️ Cargar nuevo turno</a></li>
-
-    </ul>
+<h1>Sistema de Gestión de Turnos</h1>
+    <h2>Bienvenidos a la Clínica</h2>
+        
+<div class="menu-opciones">
+    <a href="{{ url_for('ver_pacientes') }}" class="card">
+        <span>👥</span> Ver lista de pacientes
+    </a>
+    <a href="{{ url_for('ver_turnos') }}" class="card">
+        <span>🗓️</span> Ver lista de turnos
+    </a>
+    <a href="{{ url_for('cargar_paciente') }}" class="card">
+        <span>➕</span> Cargar nuevo paciente
+    </a>
+    <a href="{{ url_for('cargar_turno') }}" class="card">
+        <span>📅</span> Cargar nuevo turno
+    </a>
+</div>
 </body>
+{% endblock %}
 </html>

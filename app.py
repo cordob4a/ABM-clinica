@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 import re
 
 app = Flask(__name__)
@@ -9,7 +10,6 @@ db = SQLAlchemy(app)
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
-    dni = db.Column(db.BigInteger, primary_key=True)
     dni = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     tel = db.Column(db.String(10))
@@ -19,20 +19,6 @@ class Paciente(db.Model):
 class Turno(db.Model):
     __tablename__ = 'turno'
     id = db.Column(db.Integer, primary_key=True)
-
-    dni_paciente = db.Column(db.BigInteger, db.ForeignKey('paciente.dni'), nullable=False)
-    matricula = db.Column(db.BigInteger, nullable=False)
-    fecha = db.Column(db.String(20), nullable=False)
-    hora = db.Column(db.String(10), nullable=False)
-    estado = db.Column(db.String(20), nullable=False)
-
-    class Medico(db.Model):
-        __table__ = 'medico'
-        matricula = db.column(db.integer, primary_key=True, nullable=False) 
-        nombre = db.column(db.String(100), nullable=False)
-        especialidad = db.column(db.String(100), nullable=False)
-        tel = db.column(db.String(10), nullable=False)
-
     dni = db.Column(db.Integer, db.ForeignKey('paciente.dni'), nullable=False)
     fecha = db.Column(db.String(20), nullable=False)
     estado = db.Column(db.String(20), nullable=False)
@@ -57,10 +43,41 @@ class HistoriaClinica(db.Model):
     descripcion = db.Column(db.Text, nullable=False)
 
 
-
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/historial/<int:dni>', methods=['GET', 'POST'])
+def ver_historial(dni):
+    especialidad_filtro = request.form.get('especialidad') if request.method == 'POST' else None
+
+    # Obtener todas las especialidades de las historias del paciente
+    especialidades = db.session.query(Medico.especialidad).join(HistoriaClinica, Medico.matricula == HistoriaClinica.matricula_medico)\
+        .filter(HistoriaClinica.dni_paciente == dni).distinct().all()
+    especialidades = [e[0] for e in especialidades]
+
+    # Obtener el historial clínico del paciente con o sin filtro
+    query = db.session.query(HistoriaClinica.fecha, HistoriaClinica.descripcion,
+                             Medico.especialidad)\
+             .join(Medico, HistoriaClinica.matricula_medico == Medico.matricula)\
+             .filter(HistoriaClinica.dni_paciente == dni)
+
+    if especialidad_filtro:
+        query = query.filter(Medico.especialidad == especialidad_filtro)
+
+    historial = query.order_by(HistoriaClinica.fecha.desc()).all()
+
+    datos = [{
+        'dni': dni,
+        'fecha': h.fecha,
+        'especialidad': h.especialidad,
+        'descripcion': h.descripcion
+    } for h in historial]
+
+    return render_template('historial_clinico.html',
+                           historial=datos,
+                           especialidades=especialidades,
+                           seleccionada=especialidad_filtro)
 
 
 @app.route('/cargar_paciente', methods=['GET', 'POST'])
@@ -81,19 +98,6 @@ def cargar_paciente():
 
     return render_template('cargar_paciente.html')
 
-@app.route('/cargar_turno', methods=['GET', 'POST'])
-def cargar_turno():
-    if request.method == 'POST':
-        dni = int(request.form['dni'])
-        matricula = int(request.form['matricula'])
-        fecha = request.form['fecha']
-        hora = request.form['hora']
-        estado = request.form['estado']
-        turno = Turno(dni_paciente=dni, matricula=matricula, fecha=fecha, hora=hora, estado=estado)
-        db.session.add(turno)
-        db.session.commit()
-        return redirect(url_for('home'))
-    return render_template('/ cargar_turno.html')
 
 @app.route('/cargar_turno', methods=['GET', 'POST']) 
 def cargar_turno():
@@ -155,6 +159,7 @@ def get_especialidades():
     especialidades = db.session.query(Medico.especialidad).distinct().all()
     return [e[0] for e in especialidades]
 
+
 @app.route('/vistap')
 def ver_pacientes():
     pacientes = Paciente.query.all()
@@ -178,23 +183,30 @@ def delete(dni):
     db.session.commit()
     return redirect(url_for('ver_pacientes'))
 
+
 @app.route('/ver_turnos', methods=['GET', 'POST'])
 def ver_turnos():
-    turnos_query = Turno.query  # 👈 armamos la consulta (aún no ejecutada)
+    especialidades = [e[0] for e in db.session.query(Medico.especialidad).distinct().all()]
+    turnos_query = Turno.query
 
     if request.method == 'POST':
         dni = request.form.get('dni')
         fecha = request.form.get('fecha')
         estado = request.form.get('estado')
+        especialidad = request.form.get('especialidad')
 
         if dni:
             turnos_query = turnos_query.filter_by(dni=dni)
         if fecha:
             turnos_query = turnos_query.filter_by(fecha=fecha)
         if estado:
-            turnos_query = turnos_query.filter_by(estado=estado)    
+            turnos_query = turnos_query.filter_by(estado=estado)
+        if especialidad and especialidad.strip():
+            turnos_query = turnos_query.join(Medico, Turno.matricula == Medico.matricula)\
+                                       .filter(func.lower(func.trim(Medico.especialidad)) == especialidad.strip().lower())
 
-    turnos = turnos_query.all()  # 👈 ejecutamos la consulta final
+    turnos = turnos_query.all()
+
     datos = []
     for turno in turnos:
         medico = Medico.query.get(turno.matricula)
@@ -203,7 +215,8 @@ def ver_turnos():
             'especialidad': medico.especialidad if medico else 'No asignada'
         })
 
-    return render_template('vistat.html', datos=datos)
+    return render_template('vistat.html', datos=datos, especialidades=especialidades)
+
 
 
 
@@ -212,38 +225,55 @@ def editar_turno(id):
     turno = Turno.query.get_or_404(id)
     especialidades = get_especialidades()
 
+    # Buscamos la historia clínica asociada al turno
     historia = HistoriaClinica.query.filter_by(
-    dni_paciente=turno.dni,
-    matricula_medico=turno.matricula,
-    fecha=turno.fecha
+        dni_paciente=turno.dni,
+        matricula_medico=turno.matricula,
+        fecha=turno.fecha
     ).first()
 
-     
     if request.method == 'POST':
-        fecha = request.form['fecha']
+        # ✅ Solo dentro del POST extraemos estos valores
+        nueva_fecha = request.form['fecha']
         estado = request.form['estado']
+        descripcion = request.form['descripcion']
 
-        # Guardamos datos clave antes de borrar
+        # Guardamos valores previos
         dni = turno.dni
         matricula = turno.matricula
 
-        # Eliminamos el turno anterior
+        # Eliminamos turno viejo
         db.session.delete(turno)
         db.session.commit()
 
-        # Creamos el nuevo turno actualizado
+        # Creamos nuevo turno
         nuevo_turno = Turno(
             dni=dni,
             matricula=matricula,
-            fecha=fecha,
+            fecha=nueva_fecha,
             estado=estado
         )
         db.session.add(nuevo_turno)
-        db.session.commit()
 
+        # Actualizamos historia clínica si existe
+        if historia:
+            historia.fecha = nueva_fecha
+            historia.descripcion = descripcion
+        else:
+            nueva_historia = HistoriaClinica(
+                dni_paciente=dni,
+                matricula_medico=matricula,
+                fecha=nueva_fecha,
+                descripcion=descripcion
+            )
+            db.session.add(nueva_historia)
+
+        db.session.commit()
         return redirect(url_for('home'))
 
+    # Si GET, mostramos el formulario con los datos actuales
     return render_template('editar_turno.html', turno=turno, especialidades=especialidades, historia=historia)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

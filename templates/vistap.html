@@ -1,15 +1,15 @@
 <h2>Pacientes Registrados:</h2>
     <ul>
-        {% for paciente in pacientes %}
+    {% for paciente in pacientes %}
         <li>
-            DNI: {{ paciente.dni }} - 
-            Nombre: {{ paciente.nombre}} - 
-            Telefono: {{ paciente.tel }}
+            DNI: {{ paciente.dni }} - Nombre: {{ paciente.nombre }} - Telefono: {{ paciente.tel }}
             <a href="{{ url_for('edit', dni=paciente.dni) }}">Editar</a>
-            <form action="{{ url_for('delete', dni=paciente.dni) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este paciente?')">
+            <form action="{{ url_for('delete', dni=paciente.dni) }}" method="POST" style="display:inline;">
                 <button type="submit">🗑️ Eliminar</button>
             </form>
+            <a href="{{ url_for('ver_historial', dni=paciente.dni) }}">🩺 Ver Historial</a>
         </li>
-        {% endfor %}
-    </ul>
+    {% endfor %}
+</ul>
+
     <a href="{{ url_for('home') }}">🏠 Volver al inicio</a>

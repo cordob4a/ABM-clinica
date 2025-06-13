@@ -2,8 +2,16 @@
 <form method="POST">
     <input type="number" name="dni" placeholder="DNI del paciente">
     <input type="date" name="fecha">
+        <label for="especialidad">Especialidad del Médico:</label>
+        <select name="especialidad">
+            {% for esp in especialidades %}
+            <option value="">Seleccione especialidad</option>
+            <option value="{{ esp }}">{{ esp }}</option>
+            {% endfor %}
+        </select><br><br>
     <label for="estado">Estado:</label>
-    <select name="estado" required>
+    <select name="estado">
+    <option value="">--Estado--</option>
     <option value="abierto">Abierto</option>
     <option value="cerrado">Cerrado</option>
     </select>   
