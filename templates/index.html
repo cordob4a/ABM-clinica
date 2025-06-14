@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Agenda de Turnos</title>
-</head>
+
 {% extends "base.html" %}
 {% block title %}Inicio{% endblock %}
 {% block content %}
-<body>
 <h1>Sistema de Gestión de Turnos</h1>
     <h2>Bienvenidos a la Clínica</h2>
-     {% if session.get('rol') == 'admin' %}   
+{% if session.get('rol') == 'admin' %}    
 <div class="menu-opciones">
-    <!--{% elif session.get('rol') == 'paciente' %}-->
     <a href="{{ url_for('ver_pacientes') }}" class="card">
         <span>👥</span> Ver lista de pacientes
     </a>
@@ -26,7 +19,5 @@
         <span>📅</span> Cargar nuevo turno
     </a>
 </div>
-{% endif %}
-</body>
+{% endif %}    
 {% endblock %}
-</html>

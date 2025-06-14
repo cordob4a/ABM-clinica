@@ -4,37 +4,17 @@ from sqlalchemy import func
 import re
 
 app = Flask(__name__)
+app.secret_key = 'admin'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinica.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)   
 
 class Usuario(db.Model):
     __tablename__ = 'usuario'
-    usuario = db.Column(db.String(100), primary_key=True)
+    usuario = db.Column(db.String(100))
     pw = db.Column(db.String(100), nullable=False)
-    rol = db.Column(db.String(20), nullable=False)  # 'admin', 'secretaria', 'paciente'
-
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        usuario = request.form['usuario']
-        pw = request.form['pw']
-        user = Usuario.query.filter_by(usuario=usuario, pw=pw).first()
-        if user:
-            session['usuario'] = user.usuario
-            session['rol'] = user.rol
-            return redirect(url_for('home'))
-        else:
-            return render_template('login.html', error='Usuario o contraseña incorrectos')
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
+    rol = db.Column(db.String(20), nullable=False)
+    id = db.Column(db.Integer,nullable=False, primary_key=True)  # 'admin',  'paciente'
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
@@ -70,15 +50,31 @@ class HistoriaClinica(db.Model):
     fecha = db.Column(db.String(20), nullable=False)
     descripcion = db.Column(db.Text, nullable=False)
 
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        usuario = request.form['usuario']
+        pw = request.form['pw']
+        user = Usuario.query.filter_by(usuario=usuario, pw=pw).first()
+        if user:
+            session['usuario'] = user.usuario
+            session['rol'] = user.rol
+            return redirect(url_for('index'))
+            
+        else:
+            return render_template('login.html', error='Usuario o contraseña incorrectos')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/index')
 def index():
     if 'usuario' not in session:
         return redirect(url_for('login'))
     return render_template('index.html')
-
-@app.route('/')
-def home():
-    return render_template('login.html')
 
 @app.route('/historial/<int:dni>', methods=['GET', 'POST'])
 def ver_historial(dni):
@@ -122,22 +118,21 @@ def cargar_paciente():
         # Verificamos si ya existe ese DNI
         if Paciente.query.get(dni):
             return render_template('cargar_paciente.html', error="El paciente ya existe.")
-
         paciente = Paciente(dni=dni, nombre=nombre, tel=tel)
-        db.session.add(paciente)
-        db.session.commit()
-        return redirect(url_for('home'))
-    paciente = Paciente(dni=dni, nombre=nombre, tel=tel)
-    db.session.add(paciente)
+        db.session.add(paciente)    
 
-# Crear usuario tipo paciente
-    dni_str = str(dni)
-    usuario = Usuario(
-        usuario=dni_str,
-        pw=nombre.lower() + dni_str[-4:],
-        rol='paciente')
-    db.session.add(usuario)
-    db.session.commit()
+        # Crear usuario tipo paciente
+        dni_str = str(dni)
+        usuario = Usuario(
+            usuario=dni_str,
+            pw=nombre.lower() + dni_str[-4:],
+            rol='paciente')
+        db.session.add(usuario)
+        db.session.commit()
+        return redirect(url_for('index'))
+
+
+
 
     return render_template('cargar_paciente.html')
 
@@ -191,7 +186,7 @@ def cargar_turno():
         db.session.add(nueva_historia)
 
         db.session.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
 
     return render_template('cargar_turno.html', especialidades=especialidades)
 
@@ -303,11 +298,10 @@ def editar_turno(id):
             db.session.add(nueva_historia)
 
         db.session.commit()
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
 
     # Si GET, mostramos el formulario con los datos actuales
     return render_template('editar_turno.html', turno=turno, especialidades=especialidades, historia=historia)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
