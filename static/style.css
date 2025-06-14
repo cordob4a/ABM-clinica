@@ -101,15 +101,13 @@ a {
         padding: 15px;
     }
 }
-
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: url('/static/bg-form.jpg') no-repeat center center fixed;
     background-size: cover;
 }
-
-.form-container {
+.form-containnr{
     max-width: 500px;
     margin: 80px auto;
     background-color: white;
@@ -123,13 +121,19 @@ form h2 {
     text-align: center;
     color: #333;
 }
-
+.clase-fecha{
+    display: block;
+    margin-top: 5px;
+    font-weight: bold;
+    color: #444;
+}
 label {
     display: block;
     margin-top: 15px;
     font-weight: bold;
     color: #444;
 }
+
 
 input, select, textarea {
     width: 100%;
@@ -155,4 +159,155 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    padding: 12px 16px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 16px;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 90%;
+    margin: auto;
+    padding: 20px;
+}
+
+
+/* Estilo para la caja de filtros */
+.filtros-container {    
+    display: flex;
+    flex-wrap: wrap; /* Opcional: para que en pantallas chicas se acomoden */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filtros-container input,
+.filtros-container select,
+.filtros-container button {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+.filter-box button:hover {
+    background-color: #0056b3;
+}
+
+/* Tabla de turnos */
+.turno-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.turno-table th, .turno-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: 15px;
+}
+
+.turno-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.turno-table tr:last-child td {
+    border-bottom: none;
+}
+.tabla-container {
+  margin-top: 30px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px #ddd;
+}
+
+.tabla-estilo {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.tabla-estilo thead {
+  background-color: #0080ff;
+  color: white;
+}
+
+.tabla-estilo th, .tabla-estilo td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabla-estilo tr:hover {
+  background-color: #f1f1f1;
+}
+
+.btn-eliminar {
+  background-color: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-volver {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  text-decoration: none;
+  color: #0080ff;
+  font-weight: bold;
+}
+
+.titulo {
+  text-align: center;
+  margin-top: 30px;
+  color: #333;
+}
+.acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.acciones {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.btn-accion {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+.btn-accion:hover {
+    background-color: #0056b3;
+}
+.btn-accion:focus {
+    box-shadow: 0 0 0 2px #3399ff;
 }

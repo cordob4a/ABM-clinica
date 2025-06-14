@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for,session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 import re
@@ -6,7 +6,35 @@ import re
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinica.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)    
+db = SQLAlchemy(app)   
+
+class Usuario(db.Model):
+    __tablename__ = 'usuario'
+    usuario = db.Column(db.String(100), primary_key=True)
+    pw = db.Column(db.String(100), nullable=False)
+    rol = db.Column(db.String(20), nullable=False)  # 'admin', 'secretaria', 'paciente'
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        usuario = request.form['usuario']
+        pw = request.form['pw']
+        user = Usuario.query.filter_by(usuario=usuario, pw=pw).first()
+        if user:
+            session['usuario'] = user.usuario
+            session['rol'] = user.rol
+            return redirect(url_for('home'))
+        else:
+            return render_template('login.html', error='Usuario o contraseña incorrectos')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 
 class Paciente(db.Model):
     __tablename__ = 'paciente'
@@ -42,10 +70,15 @@ class HistoriaClinica(db.Model):
     fecha = db.Column(db.String(20), nullable=False)
     descripcion = db.Column(db.Text, nullable=False)
 
+@app.route('/index')
+def index():
+    if 'usuario' not in session:
+        return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route('/historial/<int:dni>', methods=['GET', 'POST'])
 def ver_historial(dni):
@@ -79,7 +112,6 @@ def ver_historial(dni):
                            especialidades=especialidades,
                            seleccionada=especialidad_filtro)
 
-
 @app.route('/cargar_paciente', methods=['GET', 'POST'])
 def cargar_paciente():
     if request.method == 'POST':
@@ -95,12 +127,23 @@ def cargar_paciente():
         db.session.add(paciente)
         db.session.commit()
         return redirect(url_for('home'))
+    paciente = Paciente(dni=dni, nombre=nombre, tel=tel)
+    db.session.add(paciente)
+
+# Crear usuario tipo paciente
+    dni_str = str(dni)
+    usuario = Usuario(
+        usuario=dni_str,
+        pw=nombre.lower() + dni_str[-4:],
+        rol='paciente')
+    db.session.add(usuario)
+    db.session.commit()
 
     return render_template('cargar_paciente.html')
 
-
 @app.route('/cargar_turno', methods=['GET', 'POST']) 
 def cargar_turno():
+
     especialidades = db.session.query(Medico.especialidad).distinct().all()
     especialidades = [e[0] for e in especialidades]
 
@@ -152,19 +195,14 @@ def cargar_turno():
 
     return render_template('cargar_turno.html', especialidades=especialidades)
 
-
-
-
 def get_especialidades():
     especialidades = db.session.query(Medico.especialidad).distinct().all()
     return [e[0] for e in especialidades]
-
 
 @app.route('/vistap')
 def ver_pacientes():
     pacientes = Paciente.query.all()
     return render_template('vistap.html', pacientes=pacientes)
-
 
 @app.route('/edit/<int:dni>', methods=['GET', 'POST'])
 def edit(dni):
@@ -182,7 +220,6 @@ def delete(dni):
     db.session.delete(paciente)
     db.session.commit()
     return redirect(url_for('ver_pacientes'))
-
 
 @app.route('/ver_turnos', methods=['GET', 'POST'])
 def ver_turnos():
@@ -216,9 +253,6 @@ def ver_turnos():
         })
 
     return render_template('vistat.html', datos=datos, especialidades=especialidades)
-
-
-
 
 @app.route('/editar_turno/<int:id>', methods=['GET', 'POST'])
 def editar_turno(id):

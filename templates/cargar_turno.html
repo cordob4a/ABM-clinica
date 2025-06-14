@@ -2,10 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Cargar Turno</title>
 </head>
 <body>
-    <h1>Registrar Turno</h1>
+<div class=" form-container">    
+    <h2>Registrar Turno</h2>
 
     {% if error %}
         <p style="color:red">{{ error }}</p>
@@ -21,10 +23,10 @@
             <option value="{{ esp }}">{{ esp }}</option>
             {% endfor %}
         </select><br><br>
-
+<div class="clase-fecha">
         <label for="fecha">Fecha:</label>
         <input type="date" name="fecha" required><br><br>
-
+</div>
         <label for="estado">Estado:</label>
         <select name="estado" required>
             <option value="abierto">Abierto</option>
@@ -34,5 +36,6 @@
         <button type="submit">Guardar Turno</button>
     </form>
     <a href="{{ url_for('home') }}">🏠 Volver al inicio</a>
+    </div>
 </body>
 </html>

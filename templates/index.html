@@ -10,8 +10,9 @@
 <body>
 <h1>Sistema de Gestión de Turnos</h1>
     <h2>Bienvenidos a la Clínica</h2>
-        
+     {% if session.get('rol') == 'admin' %}   
 <div class="menu-opciones">
+    <!--{% elif session.get('rol') == 'paciente' %}-->
     <a href="{{ url_for('ver_pacientes') }}" class="card">
         <span>👥</span> Ver lista de pacientes
     </a>
@@ -25,6 +26,7 @@
         <span>📅</span> Cargar nuevo turno
     </a>
 </div>
+{% endif %}
 </body>
 {% endblock %}
 </html>
