@@ -13,7 +13,9 @@
 
  <div class="container">
 <form method="POST" class="filtros-container">
+    {% if session.get('rol') == 'admin' %}  
     <input type="number" name="dni" placeholder="DNI del paciente">
+    {%endif%}
     <input type="date" name="fecha">
     <select name="especialidad">
         <option value="">Especialidad</option>
@@ -50,8 +52,11 @@
                 <td>{{ item.turno.fecha }}</td>
                 <td>{{ item.turno.estado }}</td>
                 <td>{{ item.especialidad }}</td>
+                {% if session.get('rol') == 'admin' %}  
                 <td><a href="{{ url_for('editar_turno', id=item.turno.id) }}">📝 Editar</a></td>
-
+                {%else%}
+                <td>No hay acciones disponibles</td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>

@@ -19,5 +19,15 @@
         <span>📅</span> Cargar nuevo turno
     </a>
 </div>
-{% endif %}    
+{% elif session.get('rol') == 'paciente' %}      
+<div class="menu-opciones">
+    <a href="{{ url_for('ver_turnos') }}" class="card">
+        <span>🗓️</span> Ver lista de turnos
+    </a>
+    <a href="{{ url_for('ver_historial', dni=session['usuario']) }}" class="card">
+        <span>🗓️</span> Ver historial 
+    </a>
+</div>
+{% endif %}  
 {% endblock %}
+ 

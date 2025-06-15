@@ -56,11 +56,14 @@ def login():
         usuario = request.form['usuario']
         pw = request.form['pw']
         user = Usuario.query.filter_by(usuario=usuario, pw=pw).first()
-        if user:
+        if user.rol == 'admin':
             session['usuario'] = user.usuario
             session['rol'] = user.rol
             return redirect(url_for('index'))
-            
+        elif user.rol == 'paciente':
+            session['usuario'] = user.usuario
+            session['rol'] = user.rol
+            return redirect(url_for('index'))        
         else:
             return render_template('login.html', error='Usuario o contraseña incorrectos')
     return render_template('login.html')
@@ -76,26 +79,24 @@ def index():
         return redirect(url_for('login'))
     return render_template('index.html')
 
-@app.route('/historial/<int:dni>', methods=['GET', 'POST'])
+@app.route('/ver_historial/<int:dni>', methods=['GET', 'POST'])
 def ver_historial(dni):
     especialidad_filtro = request.form.get('especialidad') if request.method == 'POST' else None
 
-    # Obtener todas las especialidades de las historias del paciente
-    especialidades = db.session.query(Medico.especialidad).join(HistoriaClinica, Medico.matricula == HistoriaClinica.matricula_medico)\
+    # Obtener todas las especialidades registradas en las historias del paciente
+    especialidades = db.session.query(Medico.especialidad) \
+        .join(HistoriaClinica, Medico.matricula == HistoriaClinica.matricula_medico) \
         .filter(HistoriaClinica.dni_paciente == dni).distinct().all()
     especialidades = [e[0] for e in especialidades]
 
-    # Obtener el historial clínico del paciente con o sin filtro
-    query = db.session.query(HistoriaClinica.fecha, HistoriaClinica.descripcion,
-                             Medico.especialidad)\
-             .join(Medico, HistoriaClinica.matricula_medico == Medico.matricula)\
+    # Construir la consulta del historial clínico (con filtro opcional por especialidad)
+    query = db.session.query(HistoriaClinica.fecha, HistoriaClinica.descripcion, Medico.especialidad) \
+             .join(Medico, HistoriaClinica.matricula_medico == Medico.matricula) \
              .filter(HistoriaClinica.dni_paciente == dni)
-
     if especialidad_filtro:
         query = query.filter(Medico.especialidad == especialidad_filtro)
 
     historial = query.order_by(HistoriaClinica.fecha.desc()).all()
-
     datos = [{
         'dni': dni,
         'fecha': h.fecha,
@@ -107,6 +108,7 @@ def ver_historial(dni):
                            historial=datos,
                            especialidades=especialidades,
                            seleccionada=especialidad_filtro)
+
 
 @app.route('/cargar_paciente', methods=['GET', 'POST'])
 def cargar_paciente():
@@ -221,7 +223,11 @@ def ver_turnos():
     especialidades = [e[0] for e in db.session.query(Medico.especialidad).distinct().all()]
     turnos_query = Turno.query
 
-    if request.method == 'POST':
+    if session.get('rol') == 'paciente':
+        dni = int(session['usuario'])  # El DNI lo usamos como username
+        turnos_query = turnos_query.filter_by(dni=dni)
+
+    elif request.method == 'POST':
         dni = request.form.get('dni')
         fecha = request.form.get('fecha')
         estado = request.form.get('estado')

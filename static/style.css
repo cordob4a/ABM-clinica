@@ -311,3 +311,20 @@ textarea {
 .btn-accion:focus {
     box-shadow: 0 0 0 2px #3399ff;
 }
+.logout-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 1000;
+}
+
+.btn-logout:hover {
+    background-color: #c82333;
+}
