@@ -1,15 +1,47 @@
-<h2>Pacientes Registrados:</h2>
-    <ul>
-        {% for paciente in pacientes %}
-        <li>
-            DNI: {{ paciente.dni }} - 
-            Nombre: {{ paciente.nombre}} - 
-            Telefono: {{ paciente.tel }}
-            <a href="{{ url_for('edit', dni=paciente.dni) }}">Editar</a>
-            <form action="{{ url_for('delete', dni=paciente.dni) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Eliminar este paciente?')">
-                <button type="submit">🗑️ Eliminar</button>
-            </form>
-        </li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('home') }}">🏠 Volver al inicio</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Lista de Pacientes</title>
+</head>
+<body>
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<h1 class="titulo">Pacientes Registrados</h1>
+<div class="tabla-container">
+  <table class="tabla-estilo">
+        <thead>
+            <tr>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+<tbody>
+            {% for paciente in pacientes %}
+            <tr>
+                <td>{{ paciente.dni }}</td>
+                <td>{{ paciente.nombre }}</td>
+                <td>{{ paciente.tel }}</td>
+                <td class="acciones">
+                    <a href="{{ url_for('edit', dni=paciente.dni) }}"class="btn-accion editar">Editar</a>
+                    <form action="{{ url_for('delete', dni=paciente.dni) }}"class="btn-accion editar" method="POST" style="display:inline;">
+                        <button type="submit">🗑️ Eliminar</button>
+                    </form>
+                    <a href="{{ url_for('ver_historial', dni=paciente.dni) }}"class="btn-accion editar">🩺 Ver Historial</a>
+                </td>
+            </tr>    
+                {% endfor %}
+            </tbody>
+    </table>
+    <div class="text-center mt-3">
+        <a href="{{ url_for('index') }}" class="btn-accion editar">🏠 Volver al inicio</a>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

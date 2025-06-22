@@ -4,9 +4,10 @@
     <label for="fecha">Fecha:</label>
     <input type="date" name="fecha" value="{{ turno.fecha }}" required><br><br>
 
+    <label for="descripcion">Historia Clínica:</label><br>
+    <textarea name="descripcion" rows="4">{% if historia %}{{ historia.descripcion }}{% endif %}</textarea><br><br>
+
     <label for="estado">Estado:</label>
-    <label for="descripcion">Historia Clínica:</label>
-    <textarea name="descripcion" rows="4">{{ historia.descripcion }}</textarea>
     <select name="estado" required>
         <option value="abierto" {% if turno.estado == 'abierto' %}selected{% endif %}>Abierto</option>
         <option value="cerrado" {% if turno.estado == 'cerrado' %}selected{% endif %}>Cerrado</option>
@@ -14,7 +15,8 @@
 
     <button type="submit">Actualizar Turno</button>
 </form>
-<a href="{{ url_for('home') }}">🏠 Volver al inicio</a>
+
+<a href="{{ url_for('index') }}">🏠 Volver al inicio</a>
 
 {% if error %}
 <p style="color: red;">{{ error }}</p>

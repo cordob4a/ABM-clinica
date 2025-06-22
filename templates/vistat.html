@@ -1,25 +1,71 @@
-<h1>Lista de Turnos</h1>
-<form method="POST">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <title>Document</title>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Lista de Turnos</h2>
+
+ <div class="container">
+<form method="POST" class="filtros-container">
+    {% if session.get('rol') == 'admin' %}  
     <input type="number" name="dni" placeholder="DNI del paciente">
+    {%endif%}
     <input type="date" name="fecha">
-    <label for="estado">Estado:</label>
-    <select name="estado" required>
-    <option value="abierto">Abierto</option>
-    <option value="cerrado">Cerrado</option>
-    </select>   
+    <select name="especialidad">
+        <option value="">Especialidad</option>
+        {% for esp in especialidades %}
+            <option value="{{ esp }}">{{ esp }}</option>
+        {% endfor %}
+    </select>
+    <select name="estado">
+        <option value="">--Estado--</option>
+        <option value="abierto">Abierto</option>
+        <option value="cerrado">Cerrado</option>
+    </select>
     <button type="submit">Filtrar</button>
-    <a href="{{ url_for('ver_turnos') }}">
-    <button type="button">Restablecer</button>
-</a>
+    <a href="{{ url_for('ver_turnos') }}"><button type="button">Restablecer</button></a>
 </form>
-<ul>
-    {% for item in datos %}
-    <li>
-        Turno ID: {{ item.turno.id }} - Fecha: {{ item.turno.fecha }} - Estado: {{ item.turno.estado }} -
-        Especialidad: {{ item.especialidad }}
-        <a href="{{ url_for('editar_turno', id=item.turno.id) }}">📝 Editar</a>
-    </li>
-    {% endfor %}
-</ul>
-<a href="{{ url_for('home') }}">🏠 Volver al inicio</a>
+
+    <!-- TABLA DE TURNOS -->
+    <table class="turno-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>DNI</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Especialidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in datos %}
+            <tr>
+                <td>{{ item.turno.id }}</td>
+                <td>{{ item.turno.dni }}</td>
+                <td>{{ item.turno.fecha }}</td>
+                <td>{{ item.turno.estado }}</td>
+                <td>{{ item.especialidad }}</td>
+                {% if session.get('rol') == 'admin' %}  
+                <td><a href="{{ url_for('editar_turno', id=item.turno.id) }}">📝 Editar</a></td>
+                {%else%}
+                <td>No hay acciones disponibles</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('index') }}" class="btn btn-link">🏠 Volver al inicio</a>
+            </div>
+
+</body>
+</html>
 
