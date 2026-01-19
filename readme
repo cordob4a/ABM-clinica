@@ -1,2 +1,90 @@
-Historia clinica no se esta actualizando en la base
- 
+# 🏥 Sistema de Gestión de Pacientes – Flask CRUD
+
+Aplicación web desarrollada con **Flask** y **SQLAlchemy** que implementa un CRUD completo para la gestión de pacientes y turnos de una clínica. El proyecto está orientado al aprendizaje de desarrollo backend, uso de ORMs y renderizado server-side con plantillas HTML.
+
+---
+
+## 🚀 Funcionalidades
+
+- Alta de pacientes con asignación de médico y fecha de turno
+- Listado de pacientes almacenados en base de datos
+- Edición de registros existentes
+- Eliminación de pacientes
+- Persistencia de datos mediante ORM (SQLAlchemy)
+- Renderizado de vistas con Jinja2
+
+---
+
+## 🧱 Arquitectura del proyecto
+
+El proyecto sigue una arquitectura simple tipo MVC:
+
+- **Modelo**: definición de entidades con SQLAlchemy
+- **Vista**: templates HTML renderizados con Jinja2
+- **Controlador**: rutas Flask que manejan la lógica de negocio
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+- Python 3
+- Flask
+- Flask-SQLAlchemy
+- SQLite
+- Jinja2
+- HTML / CSS
+- Git
+
+---
+
+## 📂 Estructura básica
+
+├── app.py
+├── templates/
+│ ├── index.html
+│ └── edit.html
+├── instance/
+│ └── clinica.db
+└── README.md
+
+---
+
+## ⚙️ Configuración y ejecución
+
+### 1️⃣ Clonar el repositorio
+git clone https://github.com/Cordob4a/nombre-del-repo.git
+cd nombre-del-repo
+
+2️⃣ Crear entorno virtual
+python -m venv venv
+source venv/bin/activate  # Linux / Mac
+venv\Scripts\activate     # Windows
+
+3️⃣ Instalar dependencias
+pip install flask flask-sqlalchemy
+
+4️⃣ Ejecutar la aplicación
+python app.py
+La aplicación estará disponible en:
+
+http://127.0.0.1:5000
+🧪 Objetivo del proyecto
+Este proyecto fue desarrollado con fines educativos, con el objetivo de:
+
+Comprender el funcionamiento de un CRUD backend
+Aplicar conceptos básicos de Flask y SQLAlchemy
+Practicar la integración entre backend y frontend
+Consolidar conocimientos de persistencia de datos
+
+🔍 Posibles mejoras futuras
+Separación de la aplicación en blueprints
+Uso de métodos HTTP correctos (POST / DELETE)
+Validaciones de formularios
+Manejo de errores y mensajes flash
+Migración a FastAPI
+Autenticación de usuarios
+
+👤 Autor
+Julian A. Córdoba
+Analista en Sistemas
+🐙 GitHub: Cordob4a
